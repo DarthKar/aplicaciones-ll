@@ -30,9 +30,9 @@ st.title("Análisis de Clientes")
 
 # Correlación entre Edad e Ingreso
 st.subheader("Correlación Edad vs Ingreso Anual")
-correlacion = df[['Edad', 'Ingreso_Anual']].corr().iloc[0,1]
+correlacion = df[['Edad', 'Ingreso_Anual_USD']].corr().iloc[0,1]
 st.write(f"Coeficiente de correlación: {correlacion:.2f}")
-fig = px.scatter(df, x='Edad', y='Ingreso_Anual', color='Genero')
+fig = px.scatter(df, x='Edad', y='Ingreso_Anual_USD', color='Género')
 st.plotly_chart(fig)
 
 # Mapa global de clientes
@@ -44,24 +44,24 @@ st.plotly_chart(fig)
 # Análisis de Clúster según frecuencia de compra
 st.subheader("Análisis de Clúster")
 n_clusters = st.slider("Selecciona el número de clústers", 2, 10, 3)
-kmeans = KMeans(n_clusters=n_clusters, random_state=42).fit(df[['Ingreso_Anual', 'Frecuencia_Compra']])
+kmeans = KMeans(n_clusters=n_clusters, random_state=42).fit(df[['Ingreso_Anual_USD', 'Frecuencia_Compra']])
 df['Cluster'] = kmeans.labels_
-fig = px.scatter(df, x='Ingreso_Anual', y='Frecuencia_Compra', color=df['Cluster'].astype(str))
+fig = px.scatter(df, x='Ingreso_Anual_USD', y='Frecuencia_Compra', color=df['Cluster'].astype(str))
 st.plotly_chart(fig)
 
 # Gráfico de barras por género y frecuencia de compra
 st.subheader("Distribución de Frecuencia de Compra por Género")
-fig = px.bar(df, x='Genero', y='Frecuencia_Compra', color='Genero', barmode='group')
+fig = px.bar(df, x='Género', y='Frecuencia_Compra', color='Género', barmode='group')
 st.plotly_chart(fig)
 
 # Mapa de calor según ingresos
 st.subheader("Mapa de Calor de Ingresos")
-fig = px.density_mapbox(df, lat=df.geometry.y, lon=df.geometry.x, z='Ingreso_Anual', 
+fig = px.density_mapbox(df, lat=df.geometry.y, lon=df.geometry.x, z='Ingreso_Anual_USD', 
                         radius=10, mapbox_style="open-street-map")
 st.plotly_chart(fig)
 
 # Cálculo de distancias entre compradores de mayores ingresos
 st.subheader("Distancia entre Compradores de Altos Ingresos")
-top_ingresos = df.nlargest(10, 'Ingreso_Anual')[['geometry']]
+top_ingresos = df.nlargest(10, 'Ingreso_Anual_USD')[['geometry']]
 dist_matrix = squareform(pdist(top_ingresos.geometry.apply(lambda p: [p.x, p.y])))
 st.write(pd.DataFrame(dist_matrix, columns=top_ingresos.index, index=top_ingresos.index))
