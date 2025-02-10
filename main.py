@@ -7,6 +7,7 @@ from sklearn.cluster import KMeans
 from scipy.spatial.distance import pdist, squareform
 
 # Función para leer el dataset
+# Función para leer el dataset
 def leer_dataset(url):
     datos = pd.read_csv(url)
     gdf = gp.GeoDataFrame(datos, geometry=gp.points_from_xy(datos.Longitud, datos.Latitud))
@@ -24,6 +25,10 @@ def interpolar_datos(datos):
 URL = 'https://raw.githubusercontent.com/gabrielawad/programacion-para-ingenieria/refs/heads/main/archivos-datos/aplicaciones/analisis_clientes.csv'
 df = leer_dataset(URL)
 df = interpolar_datos(df)
+
+# Asegurar que las columnas son numéricas y sin valores nulos
+df[['Ingreso_Anual_USD', 'Frecuencia_Compra']] = df[['Ingreso_Anual_USD', 'Frecuencia_Compra']].apply(pd.to_numeric, errors='coerce')
+df = df.dropna(subset=['Ingreso_Anual_USD', 'Frecuencia_Compra'])
 
 # Título de la aplicación
 st.title("Análisis de Clientes")
@@ -65,3 +70,4 @@ st.subheader("Distancia entre Compradores de Altos Ingresos")
 top_ingresos = df.nlargest(10, 'Ingreso_Anual_USD')[['geometry']]
 dist_matrix = squareform(pdist(top_ingresos.geometry.apply(lambda p: [p.x, p.y])))
 st.write(pd.DataFrame(dist_matrix, columns=top_ingresos.index, index=top_ingresos.index))
+
